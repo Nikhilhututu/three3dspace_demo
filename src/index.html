@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <!-- <script src="../src//script/TranformControler.js" ></script> -->
+</head>
+<body>
+    <canvas id="mycanvas"></canvas>
+    <div id="container" class="container">
+        <span></span>
+        <div class="ui_container">
+            <img id="position0" class="myButton" src="./assets/position.svg" alt="position" onclick="onClickIcon(event,'move',0)"></img>
+            <img id="scale0"    class="myButton" src="./assets/scale.svg"   alt="scale"       onclick="onClickIcon(event,'scale',0)"></img>
+            <img id="rotate0"   class="myButton" src="./assets/rotate.svg"  alt="rotate"     onclick="onClickIcon(event,'rotate',0)"></img>
+            <img id="camera0"   class="myButton" src="./assets/camera.svg"  alt="rotate"     onclick="onClickIcon(event,'camera',0)"></img>
+        </div>
+        <div class="ui_container">
+            <img id="position1" class="myButton" src="./assets/position.svg" alt="position"onclick="onClickIcon(event,'move',1)"></img>
+            <img id="scale1"    class="myButton" src="./assets/scale.svg" alt="scale"onclick="onClickIcon(event,'scale',1)"></img>
+            <img id="rotate1"   class="myButton" src="./assets/rotate.svg" alt="rotate"onclick="onClickIcon(event,'rotate',1)"></img>
+            <img id="camera1"   class="myButton" src="./assets/camera.svg" alt="rotate"onclick="onClickIcon(event,'camera',1)"></img>
+        </div>
+        <div class="ui_container">
+            <img id="position2" class="myButton" src="./assets/position.svg" alt="position"onclick="onClickIcon(event,'move',2)"></img>
+            <img id="scale2"    class="myButton" src="./assets/scale.svg" alt="scale"onclick="onClickIcon(event,'scale',2)"></img>
+            <img id="rotate2"   class="myButton" src="./assets/rotate.svg" alt="rotate"onclick="onClickIcon(event,'rotate',2)"></img>
+            <img id="camera2"   class="myButton" src="./assets/camera.svg" alt="camera"onclick="onClickIcon(event,'camera',2)"></img>
+        </div>
+    </div>   
+    <script>
+         window.onload = ()=>{
+            startScene();
+         }
+    </script>
+</body>
+</html>
