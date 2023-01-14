@@ -11,26 +11,33 @@
 <body>
     <canvas id="mycanvas"></canvas>
     <div id="container" class="container">
-        <span></span>
-        <div class="ui_container">
+        <span>            
+        </span>
+        <div class="button_container">
             <img id="position0" class="myButton" src="./assets/position.svg" alt="position" onclick="onClickIcon(event,'move',0)"></img>
             <img id="scale0"    class="myButton" src="./assets/scale.svg"   alt="scale"       onclick="onClickIcon(event,'scale',0)"></img>
             <img id="rotate0"   class="myButton" src="./assets/rotate.svg"  alt="rotate"     onclick="onClickIcon(event,'rotate',0)"></img>
             <img id="camera0"   class="myButton" src="./assets/camera.svg"  alt="rotate"     onclick="onClickIcon(event,'camera',0)"></img>
         </div>
-        <div class="ui_container">
+        <div class="button_container">
             <img id="position1" class="myButton" src="./assets/position.svg" alt="position"onclick="onClickIcon(event,'move',1)"></img>
             <img id="scale1"    class="myButton" src="./assets/scale.svg" alt="scale"onclick="onClickIcon(event,'scale',1)"></img>
             <img id="rotate1"   class="myButton" src="./assets/rotate.svg" alt="rotate"onclick="onClickIcon(event,'rotate',1)"></img>
             <img id="camera1"   class="myButton" src="./assets/camera.svg" alt="rotate"onclick="onClickIcon(event,'camera',1)"></img>
         </div>
-        <div class="ui_container">
+        <div class="button_container">
             <img id="position2" class="myButton" src="./assets/position.svg" alt="position"onclick="onClickIcon(event,'move',2)"></img>
             <img id="scale2"    class="myButton" src="./assets/scale.svg" alt="scale"onclick="onClickIcon(event,'scale',2)"></img>
             <img id="rotate2"   class="myButton" src="./assets/rotate.svg" alt="rotate"onclick="onClickIcon(event,'rotate',2)"></img>
             <img id="camera2"   class="myButton" src="./assets/camera.svg" alt="camera"onclick="onClickIcon(event,'camera',2)"></img>
         </div>
     </div>   
+    <div class="title_container">
+        <h3>Prespective</h3>
+        <h3>X-Y</h3>
+        <h3>Y-Z</h3>
+        <h3>Z-X</h3>
+    </div>
     <script>
          window.onload = ()=>{
             startScene();

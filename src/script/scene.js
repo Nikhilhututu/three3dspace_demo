@@ -1,6 +1,6 @@
 
 import * as THREE from 'three';
-let controls,renderer,scene,cube;
+let   renderer,scene,cube;
 const frustumSize   = 8;
 const mGameaspect  = window.innerWidth/window.innerHeight;
 const raycaster = new THREE.Raycaster();
@@ -19,8 +19,9 @@ const views = [
       width: 0.5,
       height: 0.5,
       background: new THREE.Color(0xFEFCF3),
-      eye: [ 0, 5,10],
+      eye: [ 0, 10,10],
       actions: -1,
+      fov:60
     },
     {
       left: 0.0,
@@ -28,7 +29,7 @@ const views = [
       width: 0.5,
       height: 0.5,
       background: new THREE.Color(0xF5EBE0),
-      eye: [ 10, 0,0],
+      eye: [ -10, 0,0],
       actions: -1,
     },
     {
@@ -64,14 +65,12 @@ export const initScene = ()=>{
         else
             camera =  new THREE.OrthographicCamera( -frustumSize * mGameaspect ,frustumSize*mGameaspect , frustumSize , -frustumSize,0,10000);
         camera.position.fromArray( view.eye );
-        // camera.up.fromArray( view.up );
         camera.lookAt(0, 0, 0);
         view.camera = camera;
     }
-    // scene.background = new THREE.Color( 0xBCD48F );
     renderer = new THREE.WebGLRenderer({antialias: true,alpha:true,preserveDrawingBuffer: true});
     renderer.setSize(window.innerWidth, window.innerHeight );
-    // renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor( 0x000000,1);
     document.body.appendChild(renderer.domElement);
@@ -82,14 +81,27 @@ export const initScene = ()=>{
     // controls.autoRotate = false;
     // controls.enabled    = false;
     const cubesgeometry = new THREE.BoxGeometry(2,2,2);
+    const material = new THREE.MeshBasicMaterial({vertexColors: true,color:"#ffffff"});
+    const positionAttribute = cubesgeometry.getAttribute( 'position' );
+    const colors = [];
+    const color = new THREE.Color();
+    for ( let i = 0; i < positionAttribute.count; i += 3 ) {
+            color.set( Math.random() * 0x00ffff );
+            colors.push( color.r, color.g, color.b );
+            colors.push( color.r, color.g, color.b );
+            colors.push( color.r, color.g, color.b );
+    }
+    cubesgeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+    
     const size = 10;
     const divisions = 10;
     const gridHelper = new THREE.GridHelper( size, divisions );
     // gridHelper.rotation.x = Math.PI/4;
     scene.add( gridHelper );
-    const material = new THREE.MeshBasicMaterial({color:"#ffffff"});
+    
     material.opacity = .5;
     cube = new THREE.Mesh(cubesgeometry,material);
+    cube.geometry.elementsNeedUpdate = true;
     // cube.position.y+=1;
     scene.add(cube);
     window.addEventListener('resize', onWindowResize,false  );
@@ -98,6 +110,30 @@ export const initScene = ()=>{
     document.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mouseup", onMouseUp);
 } 
+function onClickIcon(evt,type, cameraNo) {
+    let i, allButtons;
+    allButtons = document.getElementsByClassName("myButton");
+    const num = evt.currentTarget.id.replace(/[^0-9]/g,'');
+    for (i = 0; i < allButtons.length; i++) {
+        const id = allButtons[i].id.replace(/[^0-9]/g,'');
+        if(num === id){
+            allButtons[i].className = allButtons[i].className.replace(" active", "");
+        }
+    }
+    evt.currentTarget.className += " active";
+    switch(cameraNo){
+        case 0:
+            views[2].actions = type;
+            break;
+        case 1:
+            views[1].actions = type;
+            break;
+        case 2:
+            views[3].actions = type;
+            break;
+      }
+  }
+
 let counter=0;
 function renderScene (){
     requestAnimationFrame(renderScene);
@@ -134,35 +170,15 @@ const onWindowResize=()=> {
             camera.aspect = aspectRatio;
             camera.updateProjectionMatrix();
       } else {
-            camera.left = (-frustumSize * aspectRatio) / 2;
-            camera.right = (frustumSize * aspectRatio) / 2;
-            camera.top = frustumSize / 2;
-            camera.bottom = -frustumSize / 2;
+            camera.left = (-frustumSize * aspectRatio);
+            camera.right = (frustumSize * aspectRatio);
+            camera.top = frustumSize;
+            camera.bottom = -frustumSize;
             camera.updateProjectionMatrix();
       }
     }
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
-function onClickIcon(evt,type, cameraType) {
-    let i, allButtons;
-    allButtons = document.getElementsByClassName("myButton");
-    for (i = 0; i < allButtons.length; i++) {
-        allButtons[i].className = allButtons[i].className.replace(" active", "");
-    }
-    console.log(allButtons.length,"       ",evt);
-    evt.currentTarget.className += " active";
-    switch(cameraType){
-        case 0:
-            views[2].actions = type;
-            break;
-        case 1:
-            views[1].actions = type;
-            break;
-        case 2:
-            views[3].actions = type;
-            break;
-      }
-  }
 
 function onMouseDown(event) {
     event.preventDefault();
@@ -179,62 +195,60 @@ function onMouseDown(event) {
         cameraScreen = 2;
     if (mouse.x > 0 && mouse.y < 0) 
         cameraScreen = 3;
-
-      console.log(cameraScreen);  
   }
 function onMouseMove(event) {
     event.preventDefault();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    
+    const multiplier =18;
     if (cameraScreen<1) 
         return;
         // console.log(views[cameraScreen].actions,"       ",cameraScreen)
     if (views[cameraScreen].actions == "move") {
         switch(cameraScreen){
                 case 1:
-                    cube.position.z = cubePosition.z - (mouse.x - initMouse.x) * 10;
-                    cube.position.y = cubePosition.y + (mouse.y - initMouse.y) * 10;
+                    cube.position.z = cubePosition.z + (mouse.x - initMouse.x) *multiplier;
+                    cube.position.y = cubePosition.y + (mouse.y - initMouse.y) *multiplier;
                     break;    
                 case 2:
-                    cube.position.x = cubePosition.x + (mouse.x - initMouse.x) * 10;
-                    cube.position.y = cubePosition.y + (mouse.y - initMouse.y) * 10;
+                    cube.position.x = cubePosition.x + (mouse.x - initMouse.x) *multiplier;
+                    cube.position.y = cubePosition.y + (mouse.y - initMouse.y) *multiplier;
                     break;    
                 case 3:
-                    cube.position.x = cubePosition.x + (mouse.x - initMouse.x) * 10;
-                    cube.position.z = cubePosition.z - (mouse.y - initMouse.y) * 10;
+                    cube.position.x = cubePosition.x + (mouse.x - initMouse.x) *multiplier;
+                    cube.position.z = cubePosition.z - (mouse.y - initMouse.y) *multiplier;
                     break;    
         }
     }
     if (views[cameraScreen].actions == "scale") {
         switch(cameraScreen){
             case 1:
-                cube.scale.z = cubeScale.z + (mouse.x - initMouse.x) * 10;
-                cube.scale.y = cubeScale.y + (mouse.y - initMouse.y) * 10;
+                cube.scale.z = cubeScale.z + (mouse.x - initMouse.x) *multiplier;
+                cube.scale.y = cubeScale.y + (mouse.y - initMouse.y) *multiplier;
                 break;
             case 2:
-                cube.scale.x = cubeScale.x + (mouse.x - initMouse.x) * 10;
-                cube.scale.y = cubeScale.y + (mouse.y - initMouse.y) * 10;
+                cube.scale.x = cubeScale.x + (mouse.x - initMouse.x) *multiplier;
+                cube.scale.y = cubeScale.y + (mouse.y - initMouse.y) *multiplier;
                 break;
             case 3:
-                cube.scale.x = cubeScale.x + (mouse.x - initMouse.x) * 10;
-                cube.scale.z = cubeScale.z + (mouse.y - initMouse.y) * 10;
+                cube.scale.x = cubeScale.x + (mouse.x - initMouse.x) *multiplier;
+                cube.scale.z = cubeScale.z + (mouse.y - initMouse.y) *multiplier;
                 break;
         }
     }
     if (views[cameraScreen].actions == "rotate") {
         switch(cameraScreen){
             case 1:
-                cube.rotation.y = cubeRotation.y - (mouse.x - initMouse.x) * 10;
-                cube.rotation.z = cubeRotation.z + (mouse.y - initMouse.y) * 10;
+                cube.rotation.y = cubeRotation.y - (mouse.x - initMouse.x) *multiplier;
+                cube.rotation.z = cubeRotation.z + (mouse.y - initMouse.y) *multiplier;
                 break;
             case 2:
-                cube.rotation.y = cubeRotation.y + (mouse.x - initMouse.x) * 10;
-                cube.rotation.x = cubeRotation.x + (mouse.y - initMouse.y) * 10;
+                cube.rotation.y = cubeRotation.y + (mouse.x - initMouse.x) *multiplier;
+                cube.rotation.x = cubeRotation.x + (mouse.y - initMouse.y) *multiplier;
                 break;
             case 3:
-                cube.rotation.x = cubeRotation.x + (mouse.x - initMouse.x) * 10;
-                cube.rotation.z = cubeRotation.z - (mouse.y - initMouse.y) * 10;
+                cube.rotation.x = cubeRotation.x + (mouse.x - initMouse.x) *multiplier;
+                cube.rotation.z = cubeRotation.z - (mouse.y - initMouse.y) *multiplier;
                 break;
         }
     }
@@ -242,16 +256,16 @@ function onMouseMove(event) {
       const camera = views[0].camera;
       switch(cameraScreen){
             case 1:
-                camera.position.z = cameraPosition.z - (mouse.x - initMouse.x) * 10;
-                camera.position.y = cameraPosition.y + (mouse.y - initMouse.y) * 10;
+                camera.position.z = cameraPosition.z - (mouse.x - initMouse.x) *multiplier;
+                camera.position.y = cameraPosition.y + (mouse.y - initMouse.y) *multiplier;
                 break;
             case 2:
-                camera.position.x = cameraPosition.x + (mouse.x - initMouse.x) * 10;
-                camera.position.y = cameraPosition.y + (mouse.y - initMouse.y) * 10;
+                camera.position.x = cameraPosition.x + (mouse.x - initMouse.x) *multiplier;
+                camera.position.y = cameraPosition.y + (mouse.y - initMouse.y) *multiplier;
                 break;
             case 3:
-                camera.position.x = cameraPosition.x + (mouse.x - initMouse.x) * 10;
-                camera.position.z = cameraPosition.z - (mouse.y - initMouse.y) * 10;
+                camera.position.x = cameraPosition.x + (mouse.x - initMouse.x) *multiplier;
+                camera.position.z = cameraPosition.z - (mouse.y - initMouse.y) *multiplier;
                 break;
       }
     }
